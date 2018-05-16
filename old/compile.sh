@@ -3,10 +3,10 @@
 EXEC=s1
 
 OMEGA=25  # Application's total number of iterations default=25
-ALPHA=12000 # Total number of iterations on computation phase default=120000
-BETA=0 # Total number of iterations on communication phase default=5200
-GAMA=100000 # Working set size default=7000
-DELTA=1 #Step at which the vector elements in memory Access loop are accessed default=512
+ALPHA=10000 # Total number of iterations on computation phase default=120000
+BETA=5200 # Total number of iterations on communication phase default=5200
+GAMA=7000 # Working set size default=7000
+DELTA=512 #Step at which the vector elements in memory Access loop are accessed default=512
 TETA=0  # Total number of iterations of compute-intesive loop default=0
 LAMBDA=22600 # Amount of data excanged among processes default=22600
 

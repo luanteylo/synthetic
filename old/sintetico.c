@@ -278,7 +278,7 @@ int fase_computacao(double **mat, double *passo, unsigned short int *passo_short
 		handle_error(3);
 
 	//if (rank == 0)
-		imprimir_resultado_memoria(tempo,passo_scalar,VECTOR_SIZE);
+		// imprimir_resultado_memoria(tempo,passo_scalar,VECTOR_SIZE);
 	
 }
 
@@ -308,7 +308,7 @@ int fase_comunicacao(int elementos, int rank)
 	tempo = mysecond()-tempo;
 	
 	//if(rank == 0)
-		imprimir_resultado_rede(tempo);
+		// imprimir_resultado_rede(tempo);
 	
 
 }
@@ -425,6 +425,10 @@ int main (int argc, char *argv[])
 
 	//preparar_dados(smsgbuf,passo,passo_scalar,mat,VECTOR_SIZE);
 	preparar_dados(smsgbuf,passo,passo_short,passo_scalar,mat,VECTOR_SIZE);
+
+
+
+	
 	inicia_ambiente_mpi(argc, argv, &rank, &numtasks, &elementos);
 
 	
@@ -438,7 +442,7 @@ int main (int argc, char *argv[])
 		//printf("Computando...\n");
 		tempo_comp = mysecond();
 		fase_computacao(mat,passo,passo_short,VECTOR_SIZE,passo_scalar,rank);
-		if(rank == 0)
+		if(rank == 0 && (i % 500) == 0)
 			printf("computacao: %f\n",mysecond() - tempo_comp);
 
 		//printf("Comunicando...\n");
@@ -446,16 +450,34 @@ int main (int argc, char *argv[])
 		fase_comunicacao(elementos,rank);
 
 
-		if(rank == 0)
+		if(rank == 0 && (i % 500) == 0)
 		{
 			printf("comunicacao: %f\n",mysecond() - tempo_comum);
 			printf("Iteracao: %d\n",i);
 		}
 
 	}
-	if(rank == 0)
+
+	if(rank == 0){
+		int retval;
+	PAPI_dmem_info_t dmem;
+
+	PAPI_get_dmem_info(&dmem);
+	printf("Mem Size:\t\t%lld\n",dmem.size);
+	printf("Mem Resident:\t\t%lld\n",dmem.resident);
+	printf("Mem High Water Mark:\t%lld\n",dmem.high_water_mark);
+	printf("Mem Shared:\t\t%lld\n",dmem.shared);
+	printf("Mem Text:\t\t%lld\n",dmem.text);
+	printf("Mem Library:\t\t%lld\n",dmem.library);
+	printf("Mem Heap:\t\t%lld\n",dmem.heap);
+	printf("Mem Locked:\t\t%lld\n",dmem.locked);
+	printf("Mem Stack:\t\t%lld\n",dmem.stack);
+	printf("Mem Pagesize:\t\t%lld\n\n",dmem.pagesize);
+
+
+		
 		printf("Label: %d Tempo: %f - VectorNum: %d - %d\n", LABEL, mysecond()-time, VECTOR_NUM, BYTES_MSG);
-	
+	}
 
 	
 	

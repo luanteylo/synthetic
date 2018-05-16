@@ -6,6 +6,10 @@
 #include <string.h>
 #include <math.h>
 
+
+#include <papi.h>
+
+
 /****************************************
 Universidade Federal Fluminense (UFF)
 Insituto de Computação
@@ -192,6 +196,8 @@ int main (int argc, char *argv[]){
 	int i;
 	int rank, numtasks, elementos;
 
+
+
 	double **mat;
 	double *passo;
 	unsigned short int *passo_short;
@@ -249,6 +255,30 @@ int main (int argc, char *argv[]){
 
 	}
 
+	puts("Hello!");
+	
+	if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT)
+		exit(1);
+	retval = PAPI_library_init(PAPI_VER_CURRENT);
+	if (retval != PAPI_VER_CURRENT)
+		handle_error(retval);
+
+
+	int retval;
+	PAPI_dmem_info_t dmem;
+
+	PAPI_get_dmem_info(&dmem);
+	printf("Mem Size:\t\t%lld\n",dmem.size);
+	printf("Mem Resident:\t\t%lld\n",dmem.resident);
+	printf("Mem High Water Mark:\t%lld\n",dmem.high_water_mark);
+	printf("Mem Shared:\t\t%lld\n",dmem.shared);
+	printf("Mem Text:\t\t%lld\n",dmem.text);
+	printf("Mem Library:\t\t%lld\n",dmem.library);
+	printf("Mem Heap:\t\t%lld\n",dmem.heap);
+	printf("Mem Locked:\t\t%lld\n",dmem.locked);
+	printf("Mem Stack:\t\t%lld\n",dmem.stack);
+	printf("Mem Pagesize:\t\t%lld\n",dmem.pagesize);
+	
 
 	if(rank == 0)
 		printf("Label: %d Tempo: %f - VectorNum: %d - %d\n", LABEL, mysecond()-time, VECTOR_NUM, BYTES_MSG);
