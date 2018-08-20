@@ -1,7 +1,7 @@
 
 CC          = gcc
 LD          = gcc 
-CFLAG       = -lpapi
+CFLAG       = -lpapi -lm
 PROG_NAME   = synthetic
 
 SRC_DIR     = ./source
@@ -15,7 +15,7 @@ OBJ_LIST = $(BUILD_DIR)/$(notdir $(SRC_LIST:.c=.o))
 all: $(PROG_NAME)
 
 compile:
-	$(CC) -c $(CFLAG) $(SRC_LIST) -o $(OBJ_LIST)
+	$(CC) -c $(CFLAG) $(CFLAGS) $(SRC_LIST) -o $(OBJ_LIST)
 
 $(PROG_NAME): compile
 	$(LD) $(OBJ_LIST) -o $(BIN_DIR)/$@ $(CFLAG)
