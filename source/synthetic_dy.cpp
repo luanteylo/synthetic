@@ -9,6 +9,10 @@
 #include <math.h>
 #include <time.h>
 
+#include <iostream>
+#include <chrono>
+#include <ctime>  
+
 
 #ifndef STEP
 	#define STEP 3
@@ -133,13 +137,19 @@ int ** compute(int **M, int SIZE){
 	return M;
 }
 
-void write_read(int step){
+void write_read(int step, int pid){
 	FILE *fp;
 
+	char name_file[100];
+
+	sprintf(name_file, "%d", pid);
+	strcat(name_file, "_io_file.txt");
+
+
 	if(step % 2 == 0)//Write
-		fp = fopen("io_file.txt", "w");
+		fp = fopen(name_file, "w");
 	else
-		fp = fopen("io_file.txt", "r");
+		fp = fopen(name_file, "r");
 		
 
 	char c;
@@ -159,6 +169,7 @@ void write_read(int step){
 
 
 int main(int argc, char **argv){
+	setbuf(stdout, NULL);
 
 	int **M;  // The matrix
 	int SIZE = M_SIZE;
@@ -167,45 +178,36 @@ int main(int argc, char **argv){
 		SIZE = atoi(argv[1]);
 	}
 
-	clock_t begin = clock();
+	auto start = std::chrono::system_clock::now();
+	
 
 	srand(time(NULL));   // should only be called once
 
 	print_info(SIZE);
 
-	clock_t begin_alloc = clock();
 	M = alloc_matrix(M, SIZE);
-	clock_t end_alloc = clock();
+	
+	
+	
+	int pid = getpid();
 
-	double time_spent_alloc = (double)(end_alloc - begin_alloc) / CLOCKS_PER_SEC;	
 
-
-	double time_spent_comp = 0;
-	double time_spent_io = 0;
-
+	mem_info();
+	
 	for(int i = 0; i < NUM_ITERATIONS; i++){
-
-		clock_t begin_comp = clock();		
-		M = compute(M, SIZE);
-		clock_t end_comp = clock();
-
-		clock_t begin_io = clock();
-		write_read(i);
-		clock_t end_io = clock();
-
-		time_spent_comp += (double)(end_comp - begin_comp) / CLOCKS_PER_SEC;
-		time_spent_io += (double)(end_io - begin_io) / CLOCKS_PER_SEC;
-
+		printf("INT: %d\n", i);
+		M = compute(M, SIZE);		
+		write_read(i, pid);
 	}
 
-	clock_t end = clock();
 
-	double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	auto end = std::chrono::system_clock::now();
 
-	printf("Time Spent: %f\n", time_spent);
-	printf("Allocation: %f (%f)\n", time_spent_alloc, 100*(time_spent_alloc/time_spent));
-	printf("Compute: %f (%f) IO: %f (%f)\n", time_spent_comp, 100*(time_spent_comp/time_spent), time_spent_io, 100*(time_spent_io/time_spent));
+    std::chrono::duration<double> elapsed_seconds = end-start;
+    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
+    std::cout << "finished computation at " << std::ctime(&end_time)
+              << "elapsed time: " << elapsed_seconds.count() << "s\n";
 
 	//Free memory	
 	for(int i = 0; i < SIZE; i++)
